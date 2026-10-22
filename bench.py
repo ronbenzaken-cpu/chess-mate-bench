@@ -3,8 +3,8 @@
 
   .venv/bin/python bench.py --verify                                  # check puzzles with python-chess
   .venv/bin/python bench.py --mock                                    # dry-run with a perfect solver
-  .venv/bin/python bench.py --model claude-haiku-5-5 --runs 3         # plain assistant, thinking off
-  .venv/bin/python bench.py --model claude-haiku-5-5 --persona grandmaster --thinking
+  .venv/bin/python bench.py --model claude-haiku-5-5 --runs 3         # thinking off
+  .venv/bin/python bench.py --model claude-haiku-5-5 --thinking       # thinking on (default budget)
 """
 import argparse
 import os
@@ -35,10 +35,7 @@ PUZZLES = [
     },
 ]
 
-PERSONAS = {
-    "assistant": "You are a helpful assistant.",
-    "grandmaster": "You are a chess grandmaster. You read positions carefully and calculate forcing lines precisely.",
-}
+SYSTEM_PROMPT = "You are a helpful assistant."
 
 PROMPT = """You are given a chess position.
 
@@ -202,12 +199,12 @@ def check_line(board, tokens, n):
 
 # ---------- model runners ----------
 
-def make_claude_cli_asker(model, thinking=False, persona="assistant"):
+def make_claude_cli_asker(model, thinking=False):
     env = {k: v for k, v in os.environ.items() if k != "MAX_THINKING_TOKENS"}
     if not thinking:
         env["MAX_THINKING_TOKENS"] = "0"
     cmd = ["claude", "-p", "--model", model, "--tools", "",
-           "--strict-mcp-config", "--system-prompt", PERSONAS[persona]]
+           "--strict-mcp-config", "--system-prompt", SYSTEM_PROMPT]
 
     def ask(prompt):
         r = subprocess.run(cmd, input=prompt, capture_output=True, text=True, env=env, timeout=600)
@@ -245,7 +242,6 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--model")
     ap.add_argument("--runs", type=int, default=1)
-    ap.add_argument("--persona", choices=PERSONAS, default="assistant")
     ap.add_argument("--thinking", action="store_true", help="leave thinking enabled (default: MAX_THINKING_TOKENS=0)")
     ap.add_argument("--verify", action="store_true")
     ap.add_argument("--mock", action="store_true")
@@ -256,16 +252,16 @@ def main():
     if args.verify:
         sys.exit(0 if verify() else 1)
     if args.show_prompt:
-        print(f"SYSTEM: {PERSONAS[args.persona]}\n")
+        print(f"SYSTEM: {SYSTEM_PROMPT}\n")
         for p in PUZZLES:
             print("=" * 60, p["name"], "\n" + build_prompt(p))
         return
     if not (args.model or args.mock):
         ap.error("pass --model, --mock, --verify or --show-prompt")
 
-    ask = make_mock_asker(PUZZLES) if args.mock else make_claude_cli_asker(args.model, args.thinking, args.persona)
+    ask = make_mock_asker(PUZZLES) if args.mock else make_claude_cli_asker(args.model, args.thinking)
     total = passed = 0
-    print(f"Model: {'mock' if args.mock else args.model}  persona: {args.persona}  "
+    print(f"Model: {'mock' if args.mock else args.model}  "
           f"thinking: {'default' if args.thinking else '0'}  runs/puzzle: {args.runs}\n")
     for p in PUZZLES:
         prompt = build_prompt(p)

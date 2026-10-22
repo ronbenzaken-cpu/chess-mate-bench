@@ -18,33 +18,31 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 
 ## Test design
 
-Each run is defined by four things:
+3 puzzles x 3 models x 2 thinking modes x 5 runs = **90 calls**.
 
 | Dimension | Values |
 |-----------|--------|
 | Model | `claude-haiku-5-5`, `claude-sonnet-5-5`, `claude-opus-5-5` |
 | Thinking | `thinking=0` (`MAX_THINKING_TOKENS=0`) or `thinking=default` (variable unset) |
-| Persona (system prompt) | `assistant`: "You are a helpful assistant."<br>`grandmaster`: "You are a chess grandmaster. You read positions carefully and calculate forcing lines precisely." |
 | Runs | 5 per combination |
 
-The two personas are **separate runs**, so you can compare them:
+Our hypotheses are in [EXPECTATIONS.md](EXPECTATIONS.md).
 
 ```
-.venv/bin/python run_all.py                        # 90 calls -> RESULTS_assistant.md
-.venv/bin/python run_all.py --persona grandmaster  # 90 calls -> RESULTS_grandmaster.md
+.venv/bin/python run_all.py      # 90 calls -> results.json + RESULTS.md
 ```
 
 Each model call is equivalent to:
 ```
 echo "$PROMPT" | MAX_THINKING_TOKENS=0 claude -p --model <model> --tools "" \
-    --strict-mcp-config --system-prompt "<persona>"
+    --strict-mcp-config --system-prompt "You are a helpful assistant."
 ```
 
 Single model, quick checks:
 ```
-.venv/bin/python bench.py --show-prompt --persona grandmaster   # print the exact prompts
-.venv/bin/python bench.py --mock                                # dry-run the grader
-.venv/bin/python bench.py --model claude-haiku-5-5 --persona grandmaster --thinking --runs 3 --show-reply
+.venv/bin/python bench.py --show-prompt     # print the exact prompts
+.venv/bin/python bench.py --mock            # dry-run the grader
+.venv/bin/python bench.py --model claude-haiku-5-5 --thinking --runs 3 --show-reply
 ```
 
 ## The prompt
@@ -111,8 +109,8 @@ Every failure falls into one category:
 
 ## Output
 
-`run_all.py` writes `results_<persona>.json` (every reply, raw) and `RESULTS_<persona>.md` with:
-- pass rate per puzzle for each model × thinking mode
+`run_all.py` writes `results.json` (every reply, raw) and `RESULTS.md` with:
+- expected vs actual per model x thinking mode (a puzzle is "solved" at 3/5 or more passes)
+- pass rate per puzzle for each model x thinking mode
 - full-line-correct rate
-- totals per model
 - failure-category counts and a list of every failure
