@@ -1,13 +1,13 @@
 # chess-mate-bench
 
-Three famous checkmate problems, easiest to hardest, for testing whether LLMs find the right moves.
+Three famous checkmate problems, from mate in 2 up to mate in 4, for testing whether LLMs find the right moves.
 Every team runs the same problems so results are comparable.
 
 | # | Problem | Mate in | Solution |
 |---|---------|---------|----------|
-| 1 | Scholar's Mate | 1 | Qxf7# |
-| 2 | Philidor's Legacy (smothered mate) | 2 | Qg8+ Rxg8 Nf7# |
-| 3 | Morphy's Opera Game finish | 2 | Qb8+ Nxb8 Rd8# |
+| 1 | Réti vs Tartakower, 1910 (double-check finish) | 2 | Bg5+ Kc7 Bd8# |
+| 2 | Anderssen's Immortal Game finish | 3 | Nxg7+ Kd8 Qf6+ Nxf6 Be7# |
+| 3 | Anderssen's Evergreen Game finish | 4 | Qxd7+ Kxd7 Bf5+ Ke8 Bd7+ Kf8 Bxe7# |
 
 ## Setup
 ```

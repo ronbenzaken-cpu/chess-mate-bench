@@ -2,25 +2,29 @@
 """Grader examples. Run: .venv/bin/python test_grade.py"""
 from bench import PUZZLES, grade
 
-SCHOLAR, PHILIDOR, OPERA = PUZZLES
+RETI, IMMORTAL, EVERGREEN = PUZZLES
 
 # (puzzle, model reply, expected category, expected line_ok)
 CASES = [
-    (SCHOLAR, "The queen takes f7 supported by the bishop.\nANSWER: Qxf7#", "pass", True),
-    (SCHOLAR, "ANSWER: **Qxf7#**", "pass", True),                          # markdown stripped
-    (SCHOLAR, "ANSWER: h5f7", "pass", True),                               # UCI accepted
-    (SCHOLAR, "ANSWER: Qxf7", "pass", True),                               # missing '#' tolerated
-    (SCHOLAR, "I think Qxf7 wins.", "no_answer", False),                   # no ANSWER line
-    (PHILIDOR, "ANSWER: Qg8+ Rxg8 Nf7#", "pass", True),
-    (PHILIDOR, "ANSWER: 1. Qg8+ Rxg8 2. Nf7#", "pass", True),              # move numbers ignored
-    (PHILIDOR, "ANSWER: Qg8+", "pass", False),                             # right key, no line
-    (PHILIDOR, "ANSWER: Qg8+ Kxg8 Nf7#", "pass", False),                   # Kxg8 is illegal (Nh6 guards g8)
-    (PHILIDOR, "ANSWER: Nf7+ Rxf7 Qxf7", "wrong", False),                  # legal but not a forced mate
-    (PHILIDOR, "ANSWER: No forced mate in 2 found", "gave_up", False),     # model says there is no mate
-    (OPERA, "ANSWER: Qb8+ Nxb8 Rd8#", "pass", True),
-    (OPERA, "ANSWER: Rd8+ Kxd8 Qb8#", "illegal", False),                   # Rd8 blocked by the knight on d7
-    (OPERA, "ANSWER: Bxe7", "illegal", False),                             # no piece to capture on e7
-    (OPERA, "first try ANSWER: Rxd7\nactually\nANSWER: Qb8+ Nxb8 Rd8#", "pass", True),  # last ANSWER wins
+    (RETI, "The bishop gives a double check.\nANSWER: Bg5+ Kc7 Bd8#", "pass", True),
+    (RETI, "ANSWER: **Bg5+ Kc7 Bd8#**", "pass", True),                      # markdown stripped
+    (RETI, "ANSWER: 1. Bg5+ Kc7 2. Bd8#", "pass", True),                    # move numbers ignored
+    (RETI, "ANSWER: Bg5+ Ke8 Rd8#", "pass", True),                          # other defence, also mate
+    (RETI, "ANSWER: Bg5+", "pass", False),                                  # right key, no line
+    (RETI, "I think Bg5+ wins.", "no_answer", False),                       # no ANSWER line
+    (RETI, "ANSWER: Bf4", "wrong", False),                                  # legal but not a forced mate
+    (RETI, "ANSWER: Qd8+ Kxd8 Bg5+", "illegal", False),                     # White has no queen
+    (RETI, "ANSWER: No forced mate in 2 found", "gave_up", False),          # model says there is no mate
+    (IMMORTAL, "ANSWER: Nxg7+ Kd8 Qf6+ Nxf6 Be7#", "pass", True),
+    (IMMORTAL, "ANSWER: Nxg7+", "pass", False),                             # right key, no line
+    (IMMORTAL, "ANSWER: Nxg7+ Kd8 Qf6+ Nxf6 Bc7#", "pass", False),          # Bc7 is not mate
+    (IMMORTAL, "ANSWER: Qf6+ Nxf6 Be7#", "illegal", False),                 # Qf3-f6 blocked by the knight on f5
+    (IMMORTAL, "ANSWER: Bc7+", "wrong", False),                             # legal check, no forced mate
+    (EVERGREEN, "ANSWER: Qxd7+ Kxd7 Bf5+ Ke8 Bd7+ Kf8 Bxe7#", "pass", True),
+    (EVERGREEN, "ANSWER: Qxd7+", "pass", False),                            # right key, no line
+    (EVERGREEN, "ANSWER: Rxd7", "illegal", False),                          # Rd1 is blocked by its own bishop on d3
+    (EVERGREEN, "ANSWER: Qe4", "wrong", False),                             # legal but not a forced mate
+    (EVERGREEN, "first try ANSWER: Qe4\nactually\nANSWER: Qxd7+ Kxd7 Bf5+ Ke8 Bd7+ Kf8 Bxe7#", "pass", True),  # last ANSWER wins
 ]
 
 failed = 0

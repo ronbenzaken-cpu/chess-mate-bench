@@ -16,22 +16,22 @@ import chess
 
 PUZZLES = [
     {
-        "name": "1. Scholar's Mate",
-        "mate_in": 1,
-        "fen": "r1bqkb1r/pppp1ppp/2n2n2/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR w KQkq - 4 4",
-        "solution": "Qxf7#",
+        "name": "1. Réti vs Tartakower, 1910 (double-check finish)",
+        "mate_in": 2,
+        "fen": "rnbk1b1r/pp3ppp/2p5/4q3/4n3/8/PPPB1PPP/2KR1BNR w - - 0 10",
+        "solution": "Bg5+ Kc7 Bd8#",
     },
     {
-        "name": "2. Philidor's Legacy (smothered mate)",
-        "mate_in": 2,
-        "fen": "5r1k/p5pp/7N/8/8/1Q6/8/6K1 w - - 0 1",
-        "solution": "Qg8+ Rxg8 Nf7#",
+        "name": "2. Anderssen's Immortal Game finish",
+        "mate_in": 3,
+        "fen": "r1b1k1nr/p2p1ppp/n2B4/1p1NPN1P/6P1/3P1Q2/P1P1K3/q5b1 w kq - 2 21",
+        "solution": "Nxg7+ Kd8 Qf6+ Nxf6 Be7#",
     },
     {
-        "name": "3. Morphy's Opera Game finish",
-        "mate_in": 2,
-        "fen": "4kb1r/p2n1ppp/4q3/4p1B1/4P3/1Q6/PPP2PPP/2KR4 w k - 0 16",
-        "solution": "Qb8+ Nxb8 Rd8#",
+        "name": "3. Anderssen's Evergreen Game finish",
+        "mate_in": 4,
+        "fen": "1r2k1r1/pbppnp1p/1b3P2/8/Q7/B1PB1q2/P4PPP/3R2K1 w - - 0 21",
+        "solution": "Qxd7+ Kxd7 Bf5+ Ke8 Bd7+ Kf8 Bxe7#",
     },
 ]
 
@@ -58,6 +58,8 @@ ANSWER: {answer_format}
 ANSWER_FORMAT = {
     1: "<the mating move in standard algebraic notation, e.g. Qxf7#>",
     2: "<the full mating line in standard algebraic notation: your move, the opponent's best reply, your mating move, e.g. Qg8+ Rxg8 Nf7#>",
+    3: "<the full mating line in standard algebraic notation: your move, the opponent's best reply, your move, the opponent's best reply, your mating move>",
+    4: "<the full mating line in standard algebraic notation: each of your moves followed by the opponent's best reply, ending with your mating move>",
 }
 
 ORDER = "KQRBNP"
