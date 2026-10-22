@@ -20,10 +20,10 @@ PUZZLES = [
         "key": "Qxf7#",
     },
     {
-        "name": "2. Legal's Mate",
-        "mate_in": 1,
-        "fen": "rn1q1bnr/ppp1kB1p/3p2p1/4N3/4P3/2N5/PPPP1PPP/R1BbK2R w KQ - 1 7",
-        "key": "Nd5#",
+        "name": "2. Philidor's Legacy (smothered mate)",
+        "mate_in": 2,
+        "fen": "5r1k/p5pp/7N/8/8/1Q6/8/6K1 w - - 0 1",
+        "key": "Qg8+",
     },
     {
         "name": "3. Morphy's Opera Game finish",
@@ -147,11 +147,13 @@ def extract_answer(reply):
     return hits[-1] if hits else None
 
 
-def make_claude_cli_asker(model):
+def make_claude_cli_asker(model, thinking=False):
     import os
     import subprocess
 
-    env = {**os.environ, "MAX_THINKING_TOKENS": "0"}
+    env = {k: v for k, v in os.environ.items() if k != "MAX_THINKING_TOKENS"}
+    if not thinking:
+        env["MAX_THINKING_TOKENS"] = "0"
     cmd = ["claude", "-p", "--model", model, "--tools", "",
            "--strict-mcp-config", "--system-prompt", "You are a helpful assistant."]
 
@@ -210,6 +212,7 @@ def main():
     ap.add_argument("--model")
     ap.add_argument("--runs", type=int, default=1)
     ap.add_argument("--verify", action="store_true")
+    ap.add_argument("--thinking", action="store_true", help="leave thinking enabled (default: MAX_THINKING_TOKENS=0)")
     ap.add_argument("--mock", action="store_true")
     ap.add_argument("--show-reply", action="store_true")
     args = ap.parse_args()
@@ -219,7 +222,7 @@ def main():
     if not (args.model or args.mock):
         ap.error("pass --model, --mock or --verify")
 
-    ask = make_mock_asker(PUZZLES) if args.mock else make_claude_cli_asker(args.model)
+    ask = make_mock_asker(PUZZLES) if args.mock else make_claude_cli_asker(args.model, args.thinking)
     total = passed = 0
     print(f"Model: {'mock' if args.mock else args.model}   runs/puzzle: {args.runs}\n")
     for p in PUZZLES:

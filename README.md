@@ -6,7 +6,7 @@ Every team runs the same problems so results are comparable.
 | # | Problem | Mate in | Key move |
 |---|---------|---------|----------|
 | 1 | Scholar's Mate | 1 | Qxf7# |
-| 2 | Legal's Mate | 1 | Nd5# |
+| 2 | Philidor's Legacy (smothered mate) | 2 | Qg8+ (Rxg8, Nf7#) |
 | 3 | Morphy's Opera Game finish | 2 | Qb8+ (Nxb8, Rd8#) |
 
 Each prompt gives the FEN, an ASCII board, and a piece list by square. The model must end with `ANSWER: <move>`.
@@ -23,6 +23,12 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 .venv/bin/python bench.py --mock                           # dry-run the grader
 .venv/bin/python bench.py --model claude-haiku-4-5 --runs 3
 ```
+Full grid (3 puzzles x 3 models x 2 thinking modes x 5 runs = 90 calls), writes `results.json` and `RESULTS.md`:
+```
+.venv/bin/python run_all.py
+```
+Edit `MODELS`, `MODES` and `RUNS` at the top of `run_all.py` to change the grid. Pass `--thinking` to `bench.py` to leave thinking enabled (default is `MAX_THINKING_TOKENS=0`).
+
 Models are run via the Claude Code CLI, equivalent to:
 ```
 echo "$PROMPT" | MAX_THINKING_TOKENS=0 claude -p --model <model> --tools "" \
