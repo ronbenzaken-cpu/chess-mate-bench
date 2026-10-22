@@ -21,7 +21,7 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 ```
 .venv/bin/python bench.py --verify                         # confirm each puzzle has a unique key move
 .venv/bin/python bench.py --mock                           # dry-run the grader
-.venv/bin/python bench.py --model claude-haiku-4-5 --runs 3
+.venv/bin/python bench.py --model claude-haiku-5-5 --runs 3
 ```
 Full grid (3 puzzles x 3 models x 2 thinking modes x 5 runs = 90 calls), writes `results.json` and `RESULTS.md`:
 ```

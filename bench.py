@@ -2,7 +2,7 @@
 """Mate-in-N benchmark: 3 famous problems, easiest to hardest.
 
   .venv/bin/python bench.py --verify                      # check puzzles with python-chess
-  .venv/bin/python bench.py --model claude-haiku-4-5       # test a model (runs `claude -p`, no thinking, no tools)
+  .venv/bin/python bench.py --model claude-haiku-5-5       # test a model (runs `claude -p`, no thinking, no tools)
   .venv/bin/python bench.py --model claude-haiku-5-5 --runs 3
   .venv/bin/python bench.py --mock                        # dry-run with a perfect solver
 """

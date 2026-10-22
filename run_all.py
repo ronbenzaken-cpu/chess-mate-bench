@@ -5,7 +5,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 import bench
 
-MODELS = {"haiku": "claude-haiku-4-5", "sonnet": "claude-sonnet-4-5", "opus": "claude-opus-4-5"}
+MODELS = {"haiku": "claude-haiku-5-5", "sonnet": "claude-sonnet-5-5", "opus": "claude-opus-5-5"}
 MODES = {"thinking=0": False, "thinking=default": True}
 RUNS = 5
 
