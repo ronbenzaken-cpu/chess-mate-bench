@@ -159,10 +159,13 @@ def parse_move(board, text):
     return None
 
 
+MOVE_LIKE = re.compile(r"^([KQRBN]?[a-h]?[1-8]?x?[a-h][1-8](=?[QRBNqrbn])?[+#]?|[O0]-[O0](-[O0])?[+#]?|[a-h][1-8][a-h][1-8][qrbn]?)$")
+
+
 # ---------- grading ----------
 
 def grade(p, reply):
-    """Returns dict: pass, category (pass|no_answer|illegal|wrong), first, line_ok, note."""
+    """Returns dict: pass, category (pass|no_answer|gave_up|illegal|wrong), first, line_ok, note."""
     board = chess.Board(p["fen"])
     n = p["mate_in"]
     answer = extract_answer(reply)
@@ -170,6 +173,9 @@ def grade(p, reply):
     if not tokens:
         return {"pass": False, "category": "no_answer", "first": None, "line_ok": False, "note": "no ANSWER line"}
 
+    if not MOVE_LIKE.match(tokens[0]):
+        return {"pass": False, "category": "gave_up", "first": None, "line_ok": False,
+                "note": f"no move given: {answer[:60]!r}"}
     first = parse_move(board, tokens[0])
     if first is None:
         return {"pass": False, "category": "illegal", "first": tokens[0], "line_ok": False,

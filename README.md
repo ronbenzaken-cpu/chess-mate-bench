@@ -30,6 +30,8 @@ Our hypotheses are in [EXPECTATIONS.md](EXPECTATIONS.md).
 
 ```
 .venv/bin/python run_all.py      # 90 calls -> results.json + RESULTS.md
+.venv/bin/python run_all.py --models haiku   # one model at a time; merged into results.json
+.venv/bin/python run_all.py --regrade        # re-grade saved replies after a grader change (no model calls)
 ```
 
 Each model call is equivalent to:
@@ -37,6 +39,9 @@ Each model call is equivalent to:
 echo "$PROMPT" | MAX_THINKING_TOKENS=0 claude -p --model <model> --tools "" \
     --strict-mcp-config --system-prompt "You are a helpful assistant."
 ```
+
+No web or tool access: `--tools ""` disables every built-in tool (including WebSearch/WebFetch) and
+`--strict-mcp-config` without an `--mcp-config` loads no MCP servers. The model can only answer from its own knowledge.
 
 Single model, quick checks:
 ```
@@ -88,6 +93,7 @@ Every failure falls into one category:
 | Category | Meaning |
 |----------|---------|
 | `no_answer` | No `ANSWER:` line |
+| `gave_up` | Answered without a move, e.g. "No forced mate in 2 found" |
 | `illegal` | First move is illegal or unparseable: the model misread the board |
 | `wrong` | First move is legal but doesn't force mate: the model miscalculated |
 | `error` | CLI call failed |

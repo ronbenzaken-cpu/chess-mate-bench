@@ -16,6 +16,7 @@ CASES = [
     (PHILIDOR, "ANSWER: Qg8+", "pass", False),                             # right key, no line
     (PHILIDOR, "ANSWER: Qg8+ Kxg8 Nf7#", "pass", False),                   # Kxg8 is illegal (Nh6 guards g8)
     (PHILIDOR, "ANSWER: Nf7+ Rxf7 Qxf7", "wrong", False),                  # legal but not a forced mate
+    (PHILIDOR, "ANSWER: No forced mate in 2 found", "gave_up", False),     # model says there is no mate
     (OPERA, "ANSWER: Qb8+ Nxb8 Rd8#", "pass", True),
     (OPERA, "ANSWER: Rd8+ Kxd8 Qb8#", "illegal", False),                   # Rd8 blocked by the knight on d7
     (OPERA, "ANSWER: Bxe7", "illegal", False),                             # no piece to capture on e7

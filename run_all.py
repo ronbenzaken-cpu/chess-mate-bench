@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 """Full grid: 3 puzzles x 3 models x 2 thinking modes x 5 runs = 90 calls -> results.json + RESULTS.md
 
-  .venv/bin/python run_all.py
+  .venv/bin/python run_all.py                  # all models
+  .venv/bin/python run_all.py --models haiku   # one model; merged into existing results.json
+  .venv/bin/python run_all.py --regrade        # re-grade saved replies (no model calls)
 """
 import argparse
 import json
+import os
 from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
 
@@ -58,11 +61,12 @@ def fmt(puzzles):
 
 
 def write_md(results, path):
-    combos = [(m, mode) for m in MODELS for mode in MODES]
+    present = {r["model"] for r in results}
+    combos = [(m, mode) for m in MODELS for mode in MODES if m in present]
     header = "| Puzzle | Mate in | " + " | ".join(f"{m} {mode}" for m, mode in combos) + " |"
     sep = "|---|---|" + "---|" * len(combos)
     L = ["# Results", "",
-         f"{len(results)} calls: {len(bench.PUZZLES)} puzzles x {len(MODELS)} models x {len(MODES)} thinking modes x {RUNS} runs.",
+         f"{len(results)} calls: {len(bench.PUZZLES)} puzzles x {len(present)} models x {len(MODES)} thinking modes x {RUNS} runs.",
          "Models: " + ", ".join(f"{k} = `{v}`" for k, v in MODELS.items()), "",
          f"## Expected vs actual (solved = at least {SOLVED_AT}/{RUNS} passes)", "",
          "| Model | Thinking | Expected to solve | Actually solved | Hypothesis |", "|---|---|---|---|---|"]
@@ -88,16 +92,31 @@ def write_md(results, path):
 
 def main():
     ap = argparse.ArgumentParser()
+    ap.add_argument("--models", nargs="+", choices=MODELS, default=list(MODELS))
     ap.add_argument("--workers", type=int, default=6)
+    ap.add_argument("--regrade", action="store_true", help="re-grade replies in results.json without calling models")
     args = ap.parse_args()
 
-    jobs = [(p, l, m, mode, th, r) for p in bench.PUZZLES for l, m in MODELS.items()
+    if args.regrade:
+        by_name = {p["name"]: p for p in bench.PUZZLES}
+        results = json.load(open("results.json"))
+        for r in results:
+            if r["category"] != "error":
+                r.update(bench.grade(by_name[r["puzzle"]], r["reply"]))
+        json.dump(results, open("results.json", "w"), indent=1)
+        write_md(results, "RESULTS.md")
+        print(f"re-graded {len(results)} replies -> RESULTS.md")
+        return
+
+    jobs = [(p, l, MODELS[l], mode, th, r) for p in bench.PUZZLES for l in args.models
             for mode, th in MODES.items() for r in range(1, RUNS + 1)]
     with ThreadPoolExecutor(args.workers) as ex:
-        results = list(ex.map(job, jobs))
+        new = list(ex.map(job, jobs))
+    old = json.load(open("results.json")) if os.path.exists("results.json") else []
+    results = [r for r in old if r["model"] not in args.models] + new
     json.dump(results, open("results.json", "w"), indent=1)
     write_md(results, "RESULTS.md")
-    print(f"{sum(r['pass'] for r in results)}/{len(results)} passed -> RESULTS.md")
+    print(f"{sum(r['pass'] for r in new)}/{len(new)} passed ({', '.join(args.models)}) -> RESULTS.md")
 
 
 if __name__ == "__main__":
